@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubra seu Animal e Característica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 250px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        /* Estilo do modal */
+        .modal {
+            display: none; /* Oculta o modal por padrão */
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4); /* Fundo escuro com opacidade */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* Centraliza o modal */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Largura do modal */
+            max-width: 400px; /* Largura máxima do modal */
+            border-radius: 10px;
+            text-align: center;
+            position: absolute; /* Usado para centralizar */
+            top: 50%; /* 50% do topo da tela */
+            left: 50%; /* 50% da esquerda da tela */
+            transform: translate(-50%, -50%); /* Centraliza o modal */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+        .result strong {
+            color: #28a745;
+        }
+        /* Estilo discreto para o link */
+        .affiliate-link {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #666;
+            text-decoration: none;
+            z-index: 1;
+        }
+        .affiliate-link:hover {
+            color: #28a745;
+        }
+        /* Estilos do Pop-up */
+        .popup-overlay {
+            display: none; /* Oculta o pop-up por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro com opacidade */
+            z-index: 3;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            max-width: 800px;
+            max-height: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .popup-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            cursor: pointer;
+            display: none; /* Inicialmente oculto */
+        }
+        .popup-close:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Descubra seu Animal e Característica</h2>
+        <p>Digite seu nome e veja qual animal você é, com uma característica especial!</p>
+        <input type="text" id="name" placeholder="Seu nome">
+        <button onclick="generateAnimal()">Descobrir Animal</button>
+    </div>
+
+    <!-- Modal para Resultado -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="result" id="result"></div>
+            <button onclick="closeModal()">Testar outro nome</button>
+        </div>
+    </div>
+
+    <!-- Link de Afiliado Discreto -->
+    <a href="https://www.rotate4all.com/ptp/promote-275727" target="_blank" class="affiliate-link">Apoie nosso trabalho</a>
+
+    <!-- Pop-up de Anúncio -->
+    <div id="popupOverlay" class="popup-overlay">
+        <div class="popup-content">
+            <button class="popup-close" id="popupClose">&times;</button>
+            <iframe src="https://www.rotate4all.com/ptp/promote-275727" title="Anúncio Rotate4All"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Função para gerar o animal
+        function generateAnimal() {
+            const nameInput = document.getElementById('name').value.trim();
+            const name = nameInput.toLowerCase();
+            const resultDiv = document.getElementById('result');
+            const modal = document.getElementById('myModal');
+
+            if (nameInput === "") {
+                resultDiv.innerHTML = "Por favor, insira seu nome!";
+                modal.style.display = "block";
+                return;
+            }
+
+            // Verificação do caso especial para "Dalati"
+            if (name === "dalati") {
+                resultDiv.innerHTML = `${capitalize(nameInput)}, você é um(a) <strong>Desconhecido</strong>, conhecido(a) por ser <strong>Diferente de tudo já visto</strong>.`;
+                modal.style.display = "block";
+                return;
+            }
+
+            const animals = [
+                { animal: "Águia", characteristic: "visão aguçada e capacidade de ver de longe" },
+                { animal: "Leão", characteristic: "coragem e liderança, o rei da selva" },
+                { animal: "Gato", characteristic: "independência e habilidade em se adaptar a qualquer ambiente" },
+                { animal: "Golfinho", characteristic: "inteligência e sociabilidade, sempre em grupo" },
+                { animal: "Elefante", characteristic: "memória impressionante e força incrível" },
+                { animal: "Cavalo", characteristic: "velocidade e lealdade, sempre correndo em busca de liberdade" },
+                { animal: "Coruja", characteristic: "sabedoria e a habilidade de enxergar na escuridão" },
+                { animal: "Tigre", characteristic: "força, agilidade e uma grande dose de determinação" },
+                { animal: "Coelho", characteristic: "rapidez e uma incrível habilidade de se esconder" },
+                { animal: "Pavão", characteristic: "beleza e a habilidade de impressionar com suas cores" },
+                { animal: "Urso", characteristic: "resiliência e força, além de ser protetor de sua família" },
+                { animal: "Lobo", characteristic: "inteligência, lealdade e uma incrível capacidade de trabalho em equipe" },
+                { animal: "Panda", characteristic: "calma e a habilidade de aproveitar os momentos simples da vida" },
+                { animal: "Canguru", characteristic: "energia e a capacidade de saltar alto em busca de seus objetivos" },
+                { animal: "Sapo", characteristic: "adaptabilidade e a habilidade de viver em diferentes ambientes" },
+                { animal: "Formiga", characteristic: "trabalho em equipe e determinação em grupo" },
+                { animal: "Pinguim", characteristic: "resiliência e capacidade de prosperar em ambientes adversos" },
+                { animal: "Falcão", characteristic: "agilidade e visão aguçada, sempre em busca de sua presa" },
+                { animal: "Baleia", characteristic: "sabedoria e a força tranquila do oceano" },
+                { animal: "Raposa", characteristic: "astúcia e habilidade em se adaptar a várias situações" },
+                { animal: "Cobra", characteristic: "misteriosa e sempre pronta para agir quando necessário" },
+                { animal: "Galo", characteristic: "vigilância e a habilidade de acordar a todos para um novo dia" },
+                { animal: "Mariposa", characteristic: "transformação e beleza, sempre em busca da luz" },
+                { animal: "Tartaruga", characteristic: "sabedoria e a paciência de saber que a jornada é longa" },
+                { animal: "Girafa", characteristic: "visão ampla e a capacidade de ver além do horizonte" },
+                { animal: "Salmão", characteristic: "determinação e coragem para nadar contra a correnteza" },
+                { animal: "Cavalo-marinho", characteristic: "singularidade e a capacidade de se adaptar ao ambiente" },
+                { animal: "Morcego", characteristic: "adaptabilidade e a habilidade de navegar na escuridão" },
+                { animal: "Peixe-palhaço", characteristic: "alegria e a habilidade de prosperar em meio à adversidade" },
+                { animal: "Orangotango", characteristic: "inteligência e a capacidade de resolver problemas com criatividade" },
+                { animal: "Rato", characteristic: "resiliência e a habilidade de sobreviver em diferentes ambientes" },
+                { animal: "Bicho-preguiça", characteristic: "tranquilidade e a arte de aproveitar a vida devagar" },
+                { animal: "Lobo-guará", characteristic: "adaptabilidade e a capacidade de viver em harmonia com a natureza" },
+                { animal: "Javali", characteristic: "força e determinação, sempre enfrentando os desafios de frente" },
+                { animal: "Caranguejo", characteristic: "resiliência e a habilidade de se proteger com sua carapaça" },
+                { animal: "Puma", characteristic: "agilidade e a capacidade de se mover silenciosamente em busca de seus objetivos" },
+                { animal: "Foca", characteristic: "sociabilidade e alegria em ambientes aquáticos" },
+                { animal: "Tucano", characteristic: "colorido e a habilidade de se destacar na multidão" },
+                { animal: "Arara", characteristic: "beleza e a capacidade de voar alto e livremente" },
+                { animal: "Corvo", characteristic: "inteligência e a habilidade de resolver problemas complexos" },
+                { animal: "Tubarão", characteristic: "força e determinação no que se propõe a fazer" },
+                { animal: "Bisonte", characteristic: "força e resistência, um verdadeiro símbolo de poder" },
+                { animal: "Macaco", characteristic: "inteligência e criatividade, sempre explorando o desconhecido" },
+                { animal: "Tigre-de-bengala", characteristic: "poder e beleza, um verdadeiro rei da selva" },
+                { animal: "Cobra-coral", characteristic: "exoticidade e a habilidade de se camuflar" },
+                { animal: "Jacaré", characteristic: "paciência e a habilidade de esperar pela hora certa" },
+                { animal: "Falcão-peregrino", characteristic: "velocidade e precisão, um verdadeiro caçador" },
+                { animal: "Cervo", characteristic: "graciosidade e a habilidade de se mover com elegância" },
+                { animal: "Suricata", characteristic: "sociabilidade e o espírito de equipe na defesa do grupo" },
+                { animal: "Hiena", characteristic: "resiliência e a habilidade de sobreviver em ambientes desafiadores" },
+                { animal: "Búfalo", characteristic: "força e a capacidade de trabalhar em equipe" },
+                { animal: "Antílope", characteristic: "agilidade e rapidez em escapar de predadores" },
+                { animal: "Canguru-vermelho", characteristic: "força e habilidade de saltar grandes distâncias" },
+                { animal: "Peixe-espinho", characteristic: "defensividade e a capacidade de se proteger de predadores" },
+                { animal: "Andorinha", characteristic: "liberdade e a habilidade de voar com graça" },
+                { animal: "Tamanduá", characteristic: "curiosidade e a habilidade de se alimentar de formigas" },
+                { animal: "Lobo-marinho", characteristic: "agilidade e capacidade de viver tanto na terra quanto na água" },
+                { animal: "Tigre Branco", characteristic: "beleza e a força única que se destaca na natureza" },
+                { animal: "Peixe-gato", characteristic: "adaptabilidade e a habilidade de viver em ambientes diversos" },
+                { animal: "Morcego-vampiro", characteristic: "adaptabilidade e o hábito de viver em grupo" },
+                { animal: "Gato-do-mato", characteristic: "agilidade e habilidade de se camuflar na natureza" },
+                { animal: "Galo-da-serra", characteristic: "beleza e capacidade de chamar a atenção" },
+                { animal: "Avestruz", characteristic: "rapidez e a habilidade de correr longas distâncias" },
+                { animal: "Tatu", characteristic: "defesa e a habilidade de se proteger" },
+                { animal: "Rinoceronte", characteristic: "força e a habilidade de se impor em seu habitat" },
+                { animal: "Urso-polar", characteristic: "resiliência e a capacidade de sobreviver em condições adversas" },
+                { animal: "Raposa-vermelha", characteristic: "astúcia e a habilidade de se adaptar" },
+                { animal: "Leopardo", characteristic: "agilidade e força, um verdadeiro caçador" },
+                { animal: "Porco-espinho", characteristic: "defesa e a capacidade de se proteger com espinhos" },
+                { animal: "Zorrilho", characteristic: "defensividade e a habilidade de se proteger" },
+                { animal: "Esquilo", characteristic: "inteligência e agilidade ao se mover" },
+                { animal: "Caracol", characteristic: "paciência e a habilidade de seguir em frente devagar" },
+                { animal: "Cacatua", characteristic: "comunicação e a habilidade de interagir com os humanos" },
+                { animal: "Papagaio", characteristic: "sociabilidade e a habilidade de interagir" },
+                { animal: "Morcego", characteristic: "nocturnidade e a capacidade de se adaptar ao escuro" },
+                { animal: "Arara-azul", characteristic: "beleza e a capacidade de se destacar" },
+                { animal: "Pinguim-imperador", characteristic: "resiliência e a capacidade de viver em ambientes frios" },
+                { animal: "Chinchila", characteristic: "maciez e a beleza" }
+            ];
+
+            // Função para gerar um índice baseado no nome
+            function getIndex(name, length) {
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) {
+                    hash += name.charCodeAt(i);
+                }
+                return hash % length;
+            }
+
+            const index = getIndex(nameInput, animals.length);
+            const animal = animals[index];
+
+            resultDiv.innerHTML = `${capitalize(nameInput)}, você é um(a) <strong>${animal.animal}</strong>, conhecido(a) por sua <strong>${animal.characteristic}</strong>.`;
+            modal.style.display = "block"; // Mostra o modal
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = "none"; // Oculta o modal
+            document.getElementById('name').value = ""; // Limpa o campo de nome
+            document.getElementById('result').innerHTML = ""; // Limpa o resultado
+        }
+
+        // Fecha o modal se o usuário clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Função para capitalizar a primeira letra do nome
+        function capitalize(str) {
+            if (str.length === 0) return "";
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        // Função para exibir o Pop-up de Anúncio
+        function showPopup() {
+            const popupOverlay = document.getElementById('popupOverlay');
+            const popupClose = document.getElementById('popupClose');
+
+            popupOverlay.style.display = "flex"; // Mostra o pop-up
+
+            // Após 13 segundos, exibe o botão de fechar
+            setTimeout(() => {
+                popupClose.style.display = "block";
+            }, 13000); // 13000 milissegundos = 13 segundos
+        }
+
+        // Função para fechar o Pop-up de Anúncio
+        function closePopup() {
+            const popupOverlay = document.getElementById('popupOverlay');
+            popupOverlay.style.display = "none"; // Oculta o pop-up
+        }
+
+        // Adiciona um evento para exibir o pop-up quando a página carregar
+        window.onload = function() {
+            showPopup();
+        }
+
+        // Adiciona um evento para fechar o pop-up quando o botão for clicado
+        document.getElementById('popupClose').addEventListener('click', closePopup);
+    </script>
+
+</body>
+</html>
